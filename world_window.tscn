@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://c34qmbn3lpukf"]
+
+[ext_resource type="PackedScene" uid="uid://ckmhdl3hagve2" path="res://world2.tscn" id="1_3q3gm"]
+
+[node name="Control" type="Window"]
+oversampling_override = 1.0
+
+[node name="world" parent="." instance=ExtResource("1_3q3gm")]

@@ -1,0 +1,63 @@
+[gd_scene load_steps=8 format=3 uid="uid://7twunb578k8s"]
+
+[ext_resource type="Script" uid="uid://yllj5o0dx86a" path="res://skill.gd" id="1_0ujn4"]
+[ext_resource type="Texture2D" uid="uid://6kt4uxkr55xj" path="res://icon.svg" id="1_feumh"]
+[ext_resource type="Script" uid="uid://caphof7gds2to" path="res://tick_component.gd" id="2_wt5lj"]
+[ext_resource type="Script" uid="uid://blah8o0b0jxx" path="res://xp_component.gd" id="4_1q15l"]
+[ext_resource type="Script" uid="uid://bntsb3qorvhts" path="res://level_component.gd" id="5_1q15l"]
+[ext_resource type="Script" uid="uid://ue0y0vrl06i" path="res://activity_component.gd" id="6_0f5mi"]
+
+[sub_resource type="Curve" id="Curve_1q15l"]
+_limits = [0.0, 10000000000.0, 0.0, 1000.0]
+bake_resolution = 1000
+_data = [Vector2(1, 10), 0.0, 0.0, 0, 0, Vector2(10, 100), 1.0350509e-07, 0.0, 0, 0, Vector2(99, 1000000), 0.0, 0.0, 0, 0, Vector2(299, 10000000), 45000.0, 0.0, 1, 0, Vector2(499, 1000000000), 1.0350509e-07, 0.0, 0, 0, Vector2(699, 3162277600), 1.0350509e-07, 0.0, 0, 0, Vector2(999, 10000000000), 1.0350509e-07, 0.0, 0, 0]
+point_count = 7
+
+[node name="Control" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -421.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0ujn4")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("1_feumh")
+stretch_mode = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 10.0
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "Level:"
+
+[node name="TickComponent" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true
+script = ExtResource("2_wt5lj")
+activityXPTick = 1.0
+activityTickSpeed = 0.2
+
+[node name="XPComponent" type="Node" parent="."]
+script = ExtResource("4_1q15l")
+
+[node name="LevelComponent" type="Node" parent="."]
+script = ExtResource("5_1q15l")
+CURVE = SubResource("Curve_1q15l")
+
+[node name="ActivityComponent" type="Node" parent="."]
+script = ExtResource("6_0f5mi")
+currentAction = "doing"
+currentActionTarget = "thing"
+
+[connection signal="timeout" from="TickComponent" to="." method="_on_tick"]

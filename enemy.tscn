@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3 uid="uid://wk12ntuyakub"]
+
+[ext_resource type="Texture2D" uid="uid://6kt4uxkr55xj" path="res://icon.svg" id="1_epg4t"]
+[ext_resource type="Script" uid="uid://76rbdyuh5wlr" path="res://enemy.gd" id="2_epg4t"]
+[ext_resource type="Script" uid="uid://c4ep0g1ih4cni" path="res://health_component.gd" id="2_qi2p4"]
+[ext_resource type="Script" uid="uid://drnoi185rahjn" path="res://attack_component.gd" id="3_qi2p4"]
+[ext_resource type="Script" uid="uid://d4cfpks8xp31n" path="res://stats_component.gd" id="4_iifgy"]
+
+[node name="Node2D" type="TextureRect"]
+offset_right = 128.0
+offset_bottom = 128.0
+scale = Vector2(0.20085114, 0.20085114)
+texture = ExtResource("1_epg4t")
+script = ExtResource("2_epg4t")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_qi2p4")
+MAX_HP = 10
+
+[node name="StatsComponent" type="Node" parent="."]
+script = ExtResource("4_iifgy")
+attack = 1.0
+defence = 1.0
+speed = 1.0
+
+[node name="AttackComponent" type="ProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.14029393
+anchor_top = 1.026615
+anchor_right = 0.14029396
+anchor_bottom = 1.026615
+offset_left = -8.0
+offset_top = 8.0
+offset_right = 60.0
+offset_bottom = 35.0
+scale = Vector2(1.6152343, 1.6152343)
+value = 100.0
+fill_mode = 1
+script = ExtResource("3_qi2p4")
+metadata/_edit_use_anchors_ = true

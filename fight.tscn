@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3 uid="uid://cp8l7viboxlxl"]
+
+[ext_resource type="Script" uid="uid://7sqkt6j3de87" path="res://fight.gd" id="1_hchht"]
+[ext_resource type="PackedScene" uid="uid://wk12ntuyakub" path="res://enemy.tscn" id="2_34m47"]
+[ext_resource type="Script" uid="uid://drnoi185rahjn" path="res://attack_component.gd" id="3_562p4"]
+[ext_resource type="Script" uid="uid://c4ep0g1ih4cni" path="res://health_component.gd" id="4_y7cdv"]
+
+[node name="fight" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 200
+script = ExtResource("1_hchht")
+
+[node name="Node2D" parent="." instance=ExtResource("2_34m47")]
+layout_mode = 2
+stretch_mode = 3
+
+[node name="AttackComponent" parent="Node2D" index="2"]
+anchor_left = 0.46006945
+anchor_top = 1.03125
+anchor_right = 0.46006945
+anchor_bottom = 1.03125
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AttackComponent" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+value = 100.0
+fill_mode = 1
+script = ExtResource("3_562p4")
+metadata/_edit_use_anchors_ = true
+
+[node name="HealthComponent" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_y7cdv")
+MAX_HP = 100
+
+[editable path="Node2D"]

@@ -1,0 +1,42 @@
+[gd_scene load_steps=9 format=3 uid="uid://ygemvod5ioax"]
+
+[ext_resource type="PackedScene" uid="uid://dhsay0r4npva" path="res://skills_window.tscn" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://bb5evttvnx1ss" path="res://main.gd" id="1_lquwl"]
+[ext_resource type="PackedScene" uid="uid://7twunb578k8s" path="res://skill.tscn" id="2_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://deoutktvckyx1" path="res://control.tscn" id="3_h2yge"]
+[ext_resource type="Script" uid="uid://d4cfpks8xp31n" path="res://stats_component.gd" id="5_7mycd"]
+[ext_resource type="PackedScene" uid="uid://c34qmbn3lpukf" path="res://world_window.tscn" id="6_7mycd"]
+[ext_resource type="Script" uid="uid://ue0y0vrl06i" path="res://activity_component.gd" id="7_5vw27"]
+[ext_resource type="Script" uid="uid://bebj2jis3nc5t" path="res://action_component.gd" id="8_kek77"]
+
+[node name="Screen" type="Node2D"]
+position = Vector2(742, 382)
+scale = Vector2(5.0399976, 5.0399976)
+script = ExtResource("1_lquwl")
+
+[node name="Control" parent="." instance=ExtResource("1_ig7tw")]
+
+[node name="Dexterity" parent="Control" instance=ExtResource("2_0xm2m")]
+offset_right = 36.0
+offset_bottom = 55.0
+scale = Vector2(0.72, 0.72)
+
+[node name="Fight" parent="." instance=ExtResource("3_h2yge")]
+
+[node name="StatsComponent" type="Node" parent="."]
+script = ExtResource("5_7mycd")
+attack = 5.0
+defence = 1.0
+speed = 10.0
+
+[node name="World" parent="." instance=ExtResource("6_7mycd")]
+
+[node name="ActivityComponent" type="Node" parent="."]
+script = ExtResource("7_5vw27")
+
+[node name="ActionComponent" type="Node" parent="."]
+script = ExtResource("8_kek77")
+
+[editable path="Fight"]
+[editable path="Fight/fight"]
+[editable path="Fight/fight/Node2D"]

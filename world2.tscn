@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://ckmhdl3hagve2"]
+
+[ext_resource type="Script" uid="uid://34inorep1wku" path="res://world.gd" id="1_lueux"]
+[ext_resource type="Script" uid="uid://2a1lcdbnv631" path="res://camera_2d.gd" id="2_bkyvu"]
+
+[node name="world" type="Node2D"]
+script = ExtResource("1_lueux")
+view_radius_chunks = 16
+target_path = NodePath("Camera2D")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+script = ExtResource("2_bkyvu")
+
+[node name="Chunks" type="Node2D" parent="."]
