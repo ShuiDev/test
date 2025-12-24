@@ -50,12 +50,26 @@ signal prop_right_clicked(prop : EmojiProp)
 @export var forest_min_height: float = 0.10
 @export var forest_max_height: float = 0.45
 @export var forest_density: float = 0.10
-@export var forest_emoji: String = "🌲"
+@export var forest_emojis: Array[String] = ["🌲", "🌳", "🌴"]
 
 # Mountains
 @export var mountain_min_height: float = 0.65
 @export var mountain_density: float = 0.08
-@export var mountain_emoji: String = "⛰️"
+@export var mountain_emojis: Array[String] = ["⛰️", "🏔️", "🗻"]
+
+# Fish (water)
+@export var fish_density: float = 0.05
+@export var fish_emojis: Array[String] = ["🐟", "🐠", "🐡", "🦈", "🐙"]
+
+# Sand (coast)
+@export var sand_density: float = 0.06
+@export var sand_emojis: Array[String] = ["🏜️", "🏖️"]
+
+# Forage (plains)
+@export var forage_min_height: float = 0.05
+@export var forage_max_height: float = 0.40
+@export var forage_density: float = 0.07
+@export var forage_emojis: Array[String] = ["🌿", "🍄", "🌾", "🥕", "🥬"]
 
 # --- Hover info box ---
 @export var info_padding: Vector2 = Vector2(10, 8)
@@ -209,11 +223,20 @@ func _show_action_menu(p: EmojiProp, a: Array, f : Callable) -> void:
 	_act_panel.visible = true
 
 	var title = "Actions"
-	
-	for b in a:
+
+	for child in _act_box.get_children():
+		child.queue_free()
+
+	for action_data in a:
 		var x = Button.new()
-		x.text = b
-		x.pressed.connect(f.bind(x.text,p.text))
+		x.text = action_data.get("label", action_data.get("name", title))
+		var disabled = action_data.get("disabled", false)
+		x.disabled = disabled
+		if not disabled:
+			x.pressed.connect(func():
+				_act_panel.visible = false
+				f.call(action_data, p.kind)
+			)
 		_act_box.add_child(x)
 
 func _hide_info_for_prop(p: EmojiProp) -> void:
@@ -419,15 +442,33 @@ func _spawn_props_for_chunk(c: Vector2i, heights: PackedFloat32Array, sp: Sprite
 
 			var h = float(heights[y * S + x])
 			var roll = rng.randf()
+			var coast_max = sea_level + coast_width
 
-			if h > forest_min_height and h < forest_max_height:
-				if roll < forest_density:
-					_add_prop(decor, "forest", forest_emoji, c, Vector2i(x, y), h)
+			if h < sea_level:
+				if roll < fish_density:
+					_add_prop(decor, "fish", _pick_emoji(rng, fish_emojis), c, Vector2i(x, y), h)
+					placed += 1
+			elif h < coast_max:
+				if roll < sand_density:
+					_add_prop(decor, "sand", _pick_emoji(rng, sand_emojis), c, Vector2i(x, y), h)
 					placed += 1
 			elif h > mountain_min_height:
 				if roll < mountain_density:
-					_add_prop(decor, "mountain", mountain_emoji, c, Vector2i(x, y), h)
+					_add_prop(decor, "mountain", _pick_emoji(rng, mountain_emojis), c, Vector2i(x, y), h)
 					placed += 1
+			elif h > forest_min_height and h < forest_max_height:
+				if roll < forest_density:
+					_add_prop(decor, "forest", _pick_emoji(rng, forest_emojis), c, Vector2i(x, y), h)
+					placed += 1
+			elif h > forage_min_height and h < forage_max_height:
+				if roll < forage_density:
+					_add_prop(decor, "forage", _pick_emoji(rng, forage_emojis), c, Vector2i(x, y), h)
+					placed += 1
+
+func _pick_emoji(rng: RandomNumberGenerator, options: Array[String]) -> String:
+	if options.is_empty():
+		return ""
+	return options[rng.randi_range(0, options.size() - 1)]
 
 
 func _add_prop(parent: Node2D, kind: String, emoji: String, chunk: Vector2i, local_px: Vector2i, height_value: float) -> void:
