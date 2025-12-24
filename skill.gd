@@ -9,12 +9,20 @@ func _on_tick() -> void:
 	xc.gainXP(tc.getXP())
 	if %ProgressBar.value == %ProgressBar.max_value:
 		lc.gainLevel()
-		$Label.text = "Level: %s
-		Current XP: %s
-		Neded XP: %s" % [lc.getLevel(), %ProgressBar.value, %ProgressBar.max_value]
-	
-	
+	_update_label()
+		
+		
 func _set_activity(a,t,x,s) -> void:
 	ac.setActivity(a,t)
 	tc.setXP(x)
 	tc.setSpeed(s)
+	_update_label()
+
+func _update_label() -> void:
+	$Label.text = "Activity: %s %s\nLevel: %s\nCurrent XP: %s\nNeeded XP: %s" % [
+		ac.currentAction,
+		ac.currentActionTarget,
+		lc.getLevel(),
+		%ProgressBar.value,
+		%ProgressBar.max_value
+	]
