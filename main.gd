@@ -20,16 +20,21 @@ func _ready() -> void:
 
 
 func show_actions(p):
-	var actions = _decorate_actions(action.get_actions(p.kind))
+	var actions = _decorate_actions(action.get_actions(p.kind), p.tier_level)
 	if actions.is_empty():
 		return
 	world._show_action_menu(p, actions, _on_action_selected)
 
-func _on_action_selected(action_data: Dictionary, target_kind: String) -> void:
+func _on_action_selected(action_data: Dictionary, target_kind: String, tier_level: int) -> void:
 	var skill_name = action_data.get("skill", "")
 	if not skills.has(skill_name):
 		return
 	if action_data.get("disabled", false):
+		return
+	var required_level = int(action_data.get("min_level", 1))
+	if tier_level > 0 and required_level != tier_level:
+		return
+	if _get_skill_level(skill_name) < required_level:
 		return
 	_stop_all_skills()
 	_current_skill_name = skill_name
@@ -53,16 +58,18 @@ func _on_action_selected(action_data: Dictionary, target_kind: String) -> void:
 		action_data.get("speed", 1.0)
 	)
 
-func _decorate_actions(actions: Array) -> Array:
+func _decorate_actions(actions: Array, tier_level: int) -> Array:
 	var decorated: Array = []
 	for action_data in actions:
 		var data = action_data.duplicate()
 		var skill_name = data.get("skill", "")
 		var required_level = int(data.get("min_level", 1))
 		var skill_level = _get_skill_level(skill_name)
+		if tier_level > 0 and required_level != tier_level:
+			continue
 		if required_level > 1:
 			data["label"] = "%s (Lvl %s)" % [data.get("name", ""), required_level]
-		if skill_level > 0 and skill_level < required_level:
+		if skill_level < required_level:
 			data["disabled"] = true
 		decorated.append(data)
 	return decorated
