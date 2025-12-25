@@ -88,8 +88,3 @@ func _scale_xp(base_xp: float) -> float:
 func _stop_all_skills() -> void:
 	for skill in skills.values():
 		skill._set_active(false)
-			action_data.get("name", ""),
-			target_kind,
-			action_data.get("xp", 0.0),
-			action_data.get("speed", 1.0)
-		)
