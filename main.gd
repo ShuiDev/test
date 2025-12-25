@@ -25,13 +25,15 @@ func show_actions(p):
 		return
 	world._show_action_menu(p, actions, _on_action_selected)
 
-func _on_action_selected(action_data: Dictionary, target_kind: String) -> void:
+func _on_action_selected(action_data: Dictionary, target_kind: String, tier_level: int) -> void:
 	var skill_name = action_data.get("skill", "")
 	if not skills.has(skill_name):
 		return
 	if action_data.get("disabled", false):
 		return
 	var required_level = int(action_data.get("min_level", 1))
+	if tier_level > 0 and required_level != tier_level:
+		return
 	if _get_skill_level(skill_name) < required_level:
 		return
 	_stop_all_skills()
