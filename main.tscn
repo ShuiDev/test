@@ -21,6 +21,48 @@ offset_right = 36.0
 offset_bottom = 55.0
 scale = Vector2(0.72, 0.72)
 
+[node name="Woodcutting" parent="Control" instance=ExtResource("2_0xm2m")]
+offset_left = 0.0
+offset_top = 60.0
+offset_right = 36.0
+offset_bottom = 115.0
+scale = Vector2(0.72, 0.72)
+
+[node name="Firemaking" parent="Control" instance=ExtResource("2_0xm2m")]
+offset_left = 0.0
+offset_top = 120.0
+offset_right = 36.0
+offset_bottom = 175.0
+scale = Vector2(0.72, 0.72)
+
+[node name="Mining" parent="Control" instance=ExtResource("2_0xm2m")]
+offset_left = 0.0
+offset_top = 180.0
+offset_right = 36.0
+offset_bottom = 235.0
+scale = Vector2(0.72, 0.72)
+
+[node name="Fishing" parent="Control" instance=ExtResource("2_0xm2m")]
+offset_left = 0.0
+offset_top = 240.0
+offset_right = 36.0
+offset_bottom = 295.0
+scale = Vector2(0.72, 0.72)
+
+[node name="Foraging" parent="Control" instance=ExtResource("2_0xm2m")]
+offset_left = 0.0
+offset_top = 300.0
+offset_right = 36.0
+offset_bottom = 355.0
+scale = Vector2(0.72, 0.72)
+
+[node name="Digging" parent="Control" instance=ExtResource("2_0xm2m")]
+offset_left = 0.0
+offset_top = 360.0
+offset_right = 36.0
+offset_bottom = 415.0
+scale = Vector2(0.72, 0.72)
+
 [node name="Fight" parent="." instance=ExtResource("3_h2yge")]
 
 [node name="StatsComponent" type="Node" parent="."]
