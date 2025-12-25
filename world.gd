@@ -50,12 +50,48 @@ signal prop_right_clicked(prop : EmojiProp)
 @export var forest_min_height: float = 0.10
 @export var forest_max_height: float = 0.45
 @export var forest_density: float = 0.10
-@export var forest_emoji: String = "🌲"
+@export var forest_tiers: Array[Dictionary] = [
+	{"min_level": 1, "emojis": ["🌲", "🌳"]},
+	{"min_level": 8, "emojis": ["🌳"]},
+	{"min_level": 10, "emojis": ["🌴", "🌲"]},
+	{"min_level": 20, "emojis": ["🌴"]},
+	{"min_level": 25, "emojis": ["🌲"]},
+]
 
 # Mountains
 @export var mountain_min_height: float = 0.65
 @export var mountain_density: float = 0.08
-@export var mountain_emoji: String = "⛰️"
+@export var mountain_tiers: Array[Dictionary] = [
+	{"min_level": 1, "emojis": ["⛰️"]},
+	{"min_level": 15, "emojis": ["🏔️"]},
+	{"min_level": 30, "emojis": ["🗻"]},
+]
+
+# Fish (water)
+@export var fish_density: float = 0.05
+@export var fish_tiers: Array[Dictionary] = [
+	{"min_level": 1, "emojis": ["🐟", "🐠"]},
+	{"min_level": 12, "emojis": ["🐡", "🐙"]},
+	{"min_level": 25, "emojis": ["🦈"]},
+]
+
+# Sand (coast)
+@export var sand_density: float = 0.06
+@export var sand_tiers: Array[Dictionary] = [
+	{"min_level": 1, "emojis": ["🏖️"]},
+	{"min_level": 10, "emojis": ["🏜️"]},
+	{"min_level": 20, "emojis": ["🏜️"]},
+]
+
+# Forage (plains)
+@export var forage_min_height: float = 0.05
+@export var forage_max_height: float = 0.40
+@export var forage_density: float = 0.07
+@export var forage_tiers: Array[Dictionary] = [
+	{"min_level": 1, "emojis": ["🌿", "🌾"]},
+	{"min_level": 8, "emojis": ["🥕", "🥬"]},
+	{"min_level": 20, "emojis": ["🍄"]},
+]
 
 # --- Hover info box ---
 @export var info_padding: Vector2 = Vector2(10, 8)
@@ -102,6 +138,7 @@ class EmojiProp:
 	var local_px: Vector2i = Vector2i.ZERO
 	var world_pos: Vector2 = Vector2.ZERO
 	var height_value: float = 0.0
+	var tier_level: int = 1
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
@@ -198,8 +235,8 @@ func _show_info_for_prop(p: EmojiProp) -> void:
 	else:
 		title = p.kind
 
-	_info_label.text = "%s\nChunk: (%d, %d)\nLocal: (%d, %d)\nHeight: %.3f" % [
-		title, p.chunk.x, p.chunk.y, p.local_px.x, p.local_px.y, p.height_value
+	_info_label.text = "%s\nTier: %d\nChunk: (%d, %d)\nLocal: (%d, %d)\nHeight: %.3f" % [
+		title, p.tier_level, p.chunk.x, p.chunk.y, p.local_px.x, p.local_px.y, p.height_value
 	]
 
 func _show_action_menu(p: EmojiProp, a: Array, f : Callable) -> void:
@@ -209,11 +246,20 @@ func _show_action_menu(p: EmojiProp, a: Array, f : Callable) -> void:
 	_act_panel.visible = true
 
 	var title = "Actions"
-	
-	for b in a:
+
+	for child in _act_box.get_children():
+		child.queue_free()
+
+	for action_data in a:
 		var x = Button.new()
-		x.text = b
-		x.pressed.connect(f.bind(x.text,p.text))
+		x.text = action_data.get("label", action_data.get("name", title))
+		var disabled = action_data.get("disabled", false)
+		x.disabled = disabled
+		if not disabled:
+			x.pressed.connect(func():
+				_act_panel.visible = false
+				f.call(action_data, p.kind)
+			)
 		_act_box.add_child(x)
 
 func _hide_info_for_prop(p: EmojiProp) -> void:
@@ -419,18 +465,94 @@ func _spawn_props_for_chunk(c: Vector2i, heights: PackedFloat32Array, sp: Sprite
 
 			var h = float(heights[y * S + x])
 			var roll = rng.randf()
+			var coast_max = sea_level + coast_width
 
-			if h > forest_min_height and h < forest_max_height:
-				if roll < forest_density:
-					_add_prop(decor, "forest", forest_emoji, c, Vector2i(x, y), h)
+			if h < sea_level:
+				if roll < fish_density:
+					var fish_tier = _pick_tier(rng, fish_tiers)
+					_add_prop(
+						decor,
+						"fish",
+						_pick_emoji(rng, fish_tier.get("emojis", [])),
+						c,
+						Vector2i(x, y),
+						h,
+						int(fish_tier.get("min_level", 1))
+					)
+					placed += 1
+			elif h < coast_max:
+				if roll < sand_density:
+					var sand_tier = _pick_tier(rng, sand_tiers)
+					_add_prop(
+						decor,
+						"sand",
+						_pick_emoji(rng, sand_tier.get("emojis", [])),
+						c,
+						Vector2i(x, y),
+						h,
+						int(sand_tier.get("min_level", 1))
+					)
 					placed += 1
 			elif h > mountain_min_height:
 				if roll < mountain_density:
-					_add_prop(decor, "mountain", mountain_emoji, c, Vector2i(x, y), h)
+					var mountain_tier = _pick_tier(rng, mountain_tiers)
+					_add_prop(
+						decor,
+						"mountain",
+						_pick_emoji(rng, mountain_tier.get("emojis", [])),
+						c,
+						Vector2i(x, y),
+						h,
+						int(mountain_tier.get("min_level", 1))
+					)
+					placed += 1
+			elif h > forest_min_height and h < forest_max_height:
+				if roll < forest_density:
+					var forest_tier = _pick_tier(rng, forest_tiers)
+					_add_prop(
+						decor,
+						"forest",
+						_pick_emoji(rng, forest_tier.get("emojis", [])),
+						c,
+						Vector2i(x, y),
+						h,
+						int(forest_tier.get("min_level", 1))
+					)
+					placed += 1
+			elif h > forage_min_height and h < forage_max_height:
+				if roll < forage_density:
+					var forage_tier = _pick_tier(rng, forage_tiers)
+					_add_prop(
+						decor,
+						"forage",
+						_pick_emoji(rng, forage_tier.get("emojis", [])),
+						c,
+						Vector2i(x, y),
+						h,
+						int(forage_tier.get("min_level", 1))
+					)
 					placed += 1
 
+func _pick_emoji(rng: RandomNumberGenerator, options: Array[String]) -> String:
+	if options.is_empty():
+		return ""
+	return options[rng.randi_range(0, options.size() - 1)]
 
-func _add_prop(parent: Node2D, kind: String, emoji: String, chunk: Vector2i, local_px: Vector2i, height_value: float) -> void:
+func _pick_tier(rng: RandomNumberGenerator, tiers: Array[Dictionary]) -> Dictionary:
+	if tiers.is_empty():
+		return {}
+	return tiers[rng.randi_range(0, tiers.size() - 1)]
+
+
+func _add_prop(
+	parent: Node2D,
+	kind: String,
+	emoji: String,
+	chunk: Vector2i,
+	local_px: Vector2i,
+	height_value: float,
+	tier_level: int
+) -> void:
 	var p = EmojiProp.new()
 	p.text = emoji
 	p.scale = Vector2(emoji_scale, emoji_scale)
@@ -439,6 +561,7 @@ func _add_prop(parent: Node2D, kind: String, emoji: String, chunk: Vector2i, loc
 	p.chunk = chunk
 	p.local_px = local_px
 	p.height_value = height_value
+	p.tier_level = tier_level
 
 	# Compute world position (in Node2D space)
 	var world_px = Vector2(
