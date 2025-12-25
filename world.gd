@@ -235,7 +235,7 @@ func _show_info_for_prop(p: EmojiProp) -> void:
 	else:
 		title = p.kind
 
-	_info_label.text = "%s\nTier: %d\nChunk: (%d, %d)\nLocal: (%d, %d)\nHeight: %.3f" % [
+	_info_label.text = "%s (Tier %d+)\nChunk: (%d, %d)\nLocal: (%d, %d)\nHeight: %.3f" % [
 		title, p.tier_level, p.chunk.x, p.chunk.y, p.local_px.x, p.local_px.y, p.height_value
 	]
 
@@ -258,7 +258,7 @@ func _show_action_menu(p: EmojiProp, a: Array, f : Callable) -> void:
 		if not disabled:
 			x.pressed.connect(func():
 				_act_panel.visible = false
-				f.call(action_data, p.kind)
+				f.call(action_data, p.kind, p.tier_level)
 			)
 		_act_box.add_child(x)
 
@@ -540,7 +540,7 @@ func _pick_emoji(rng: RandomNumberGenerator, options: Array[String]) -> String:
 
 func _pick_tier(rng: RandomNumberGenerator, tiers: Array[Dictionary]) -> Dictionary:
 	if tiers.is_empty():
-		return {}
+		return {"min_level": 1, "emojis": []}
 	return tiers[rng.randi_range(0, tiers.size() - 1)]
 
 
