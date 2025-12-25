@@ -533,7 +533,7 @@ func _spawn_props_for_chunk(c: Vector2i, heights: PackedFloat32Array, sp: Sprite
 					)
 					placed += 1
 
-func _pick_emoji(rng: RandomNumberGenerator, options: Array[String]) -> String:
+func _pick_emoji(rng: RandomNumberGenerator, options: Array) -> String:
 	if options.is_empty():
 		return ""
 	return options[rng.randi_range(0, options.size() - 1)]
